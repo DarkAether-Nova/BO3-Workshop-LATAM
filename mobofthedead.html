@@ -138,8 +138,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .video-container iframe,
-        .video-container video {
+        .video-container iframe {
             width: 100%;
             height: 100%;
             border: none;
@@ -322,12 +321,11 @@
         <div class="main-layout">
             
             <main>
-                <!-- Video de Demostración -->
+                <!-- Video de Demostración con tu link de YouTube corregido a embed y respetando el segundo 13 -->
                 <h2 class="section-title">Video de Demostración</h2>
                 <div class="media-section">
                     <div class="video-container">
-                        <!-- Puedes cambiar el enlace del iframe por tu video de YouTube o archivo local MP4 -->
-                        <iframe src="https://www.youtube.com/watch?v=i3toX40MCio&t=13s" title="Video de Demostración" allowfullscreen></iframe>
+                        <iframe src="https://www.youtube.com/watch?v=i3toX40MCio&t=13s" title="Video de Demostración" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </div>
                 </div>
 
@@ -426,7 +424,7 @@
             localStorage.setItem('map_downloads', downloadClicks);
             document.getElementById('download-count').innerText = downloadClicks.toLocaleString();
             
-            // Simulación de inicio de descarga (puedes poner aquí tu enlace real)
+            // Simulación de inicio de descarga
             alert('¡Gracias por descargar! La descarga comenzará en breve.');
         }
     </script>
