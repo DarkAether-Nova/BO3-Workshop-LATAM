@@ -471,7 +471,7 @@
             </div>
         </header>
 
-        <div class="main-layout">
+        <main class="main-layout">
             
             <main>
                 <!-- Video de Demostración -->
@@ -486,23 +486,23 @@
                 <h2 class="section-title">Galería del Mapa</h2>
                 <div class="media-section">
                     <div class="main-image-container">
-                        <img id="mainImage" src="mob.jpg" alt="Imagen Principal">
+                        <img id="mainImage" src="fotosmob/m1.jpg" alt="Imagen Principal">
                     </div>
                     <div class="thumbnails-grid">
-                        <div class="thumbnail active" onclick="changeImage('mob.jpg', 0)">
-                            <img src="mob.jpg" alt="Miniatura 1">
+                        <div class="thumbnail active" onclick="changeImage('fotosmob/m1.jpg', 0)">
+                            <img src="fotosmob/m1.jpg" alt="Miniatura 1">
                         </div>
-                        <div class="thumbnail" onclick="changeImage('miniaturamob.jpg', 1)">
-                            <img src="miniaturamob.jpg" alt="Miniatura 2">
+                        <div class="thumbnail" onclick="changeImage('fotosmob/m2.jpg', 1)">
+                            <img src="fotosmob/m2.jpg" alt="Miniatura 2">
                         </div>
-                        <div class="thumbnail" onclick="changeImage('mapachino.jpg', 2)">
-                            <img src="mapachino.jpg" alt="Miniatura 3">
+                        <div class="thumbnail" onclick="changeImage('fotosmob/m3.jpg', 2)">
+                            <img src="fotosmob/m3.jpg" alt="Miniatura 3">
                         </div>
-                        <div class="thumbnail" onclick="changeImage('dineris.jpg', 3)">
-                            <img src="dineris.jpg" alt="Miniatura 4">
+                        <div class="thumbnail" onclick="changeImage('fotosmob/m4.jpg', 3)">
+                            <img src="fotosmob/m4.jpg" alt="Miniatura 4">
                         </div>
-                        <div class="thumbnail" onclick="changeImage('farmlogo.jpg', 4)">
-                            <img src="farmlogo.jpg" alt="Miniatura 5">
+                        <div class="thumbnail" onclick="changeImage('fotosmob/m5.jpg', 4)">
+                            <img src="fotosmob/m5.jpg" alt="Miniatura 5">
                         </div>
                     </div>
                 </div>
@@ -539,7 +539,7 @@
 
                 <!-- Botón de Descarga estilo Suscribirse de Steam y Contador -->
                 <div class="download-panel">
-                    <a href="#" class="download-btn" id="downloadBtn" onclick="incrementDownloadCount(event)">
+                    <a href="https://drive.google.com/file/d/1DQKQKl9NTA4yMje9xqnEH3aUJgVXVAjX/view" class="download-btn" id="downloadBtn" target="_blank" onclick="incrementDownloadCount(event)">
                         <span class="download-icon-plus">+</span> Descargar Traducción
                     </a>
                     <div class="download-stats">
@@ -592,7 +592,7 @@
                     </div>
                 </section>
 
-                <!-- Panel de Estadísticas del Autor (Visitas independientes al refrescar / Descargas independientes al dar clic) -->
+                <!-- Panel de Estadísticas (Visitas independientes al refrescar / Descargas independientes al dar clic) -->
                 <section class="guide-panel">
                     <h4 class="guide-panel-title">Estadísticas del Autor</h4>
                     <div class="author-stats-container">
@@ -631,14 +631,13 @@
         }
 
         /* --- Lógica del Contador de Visitas Únicas (Aumenta automáticamente al actualizar/entrar) --- */
-        let uniqueVisitors = localStorage.getItem('map_visitors') ? parseInt(localStorage.getItem('map_visitors')) : 13360;
-        // Incrementa una visita cada vez que se carga la página de forma limpia
+        let uniqueVisitors = localStorage.getItem('map_visitors') ? parseInt(localStorage.getItem('map_visitors')) : 500;
         uniqueVisitors++;
         localStorage.setItem('map_visitors', uniqueVisitors);
         document.getElementById('unique-visitors').innerText = uniqueVisitors.toLocaleString();
 
         /* --- Lógica del Contador de Descargas y Suscriptores (Independiente, solo al hacer clic) --- */
-        let downloadClicks = localStorage.getItem('map_downloads') ? parseInt(localStorage.getItem('map_downloads')) : 1245;
+        let downloadClicks = localStorage.getItem('map_downloads') ? parseInt(localStorage.getItem('map_downloads')) : 300;
         
         function updateDownloadDisplay() {
             let formattedDownloads = downloadClicks.toLocaleString();
@@ -648,17 +647,15 @@
         updateDownloadDisplay();
 
         function incrementDownloadCount(event) {
-            event.preventDefault();
+            // Nota: Ya no usamos event.preventDefault() para que Google Drive abra la pestaña con normalidad
             downloadClicks++;
             localStorage.setItem('map_downloads', downloadClicks);
             updateDownloadDisplay();
-            
-            alert('¡Gracias por descargar! La descarga comenzará en breve.');
         }
 
         /* --- Lógica de Votación (Me gusta / No me gusta estilo Steam) --- */
-        let likes = localStorage.getItem('map_likes') ? parseInt(localStorage.getItem('map_likes')) : 342;
-        let dislikes = localStorage.getItem('map_dislikes') ? parseInt(localStorage.getItem('map_dislikes')) : 12;
+        let likes = localStorage.getItem('map_likes') ? parseInt(localStorage.getItem('map_likes')) : 75;
+        let dislikes = localStorage.getItem('map_dislikes') ? parseInt(localStorage.getItem('map_dislikes')) : 3;
         let userVote = localStorage.getItem('map_user_vote');
 
         const likeBtn = document.getElementById('likeBtn');
