@@ -112,13 +112,58 @@
             padding-left: 10px;
         }
 
-        .description-box {
+        .description-box, .patch-notes-box, .credits-box {
             background: rgba(16, 24, 34, 0.6);
             padding: 20px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             margin-bottom: 30px;
             line-height: 1.6;
+        }
+
+        .patch-notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .patch-notes-box ul, .credits-box ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .patch-notes-box li, .credits-box li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .patch-notes-box li::before, .credits-box li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--steam-surface-hover);
+            font-weight: bold;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: var(--steam-surface);
+            color: var(--steam-surface-hover);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border: 1px solid rgba(102, 192, 244, 0.3);
+        }
+
+        .patch-date {
+            font-size: 0.9rem;
+            color: var(--steam-text);
+            font-style: italic;
         }
 
         /* --- Multimedia Section --- */
@@ -321,11 +366,11 @@
         <div class="main-layout">
             
             <main>
-                <!-- Video de Demostración con tu link de YouTube corregido a embed y respetando el segundo 13 -->
+                <!-- Video de Demostración -->
                 <h2 class="section-title">Video de Demostración</h2>
                 <div class="media-section">
                     <div class="video-container">
-<iframe src="https://www.youtube.com/embed/i3toX40MCio" title="Video de Demostración" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <iframe src="https://www.youtube.com/embed/i3toX40MCio" title="Video de Demostración" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </div>
                 </div>
 
@@ -358,6 +403,30 @@
                 <div class="description-box">
                     <h2 class="section-title" style="margin-top:0; border:none; padding:0;">Descripción de la Traducción</h2>
                     <p>Esta adaptación completa al español incluye el doblaje total de los diálogos de los personajes principales, textos totalmente localizados a la interfaz y subtítulos sincronizados con precisión. Se han corregido pequeños bugs de audio originales de la versión de Steam Workshop y optimizado la estabilidad general para ofrecer una experiencia inmersiva sin precedentes en este mapa emblemático.</p>
+                </div>
+
+                <!-- Notas del Parche con Versión y Fecha -->
+                <div class="patch-notes-box">
+                    <h2 class="section-title" style="margin-top:0; border:none; padding:0;">Notas del Parche</h2>
+                    <div class="patch-notes-header">
+                        <span class="version-badge">Versión 1.0.0 (Build Inicial)</span>
+                        <span class="patch-date">Fecha: 22 de Julio de 2026</span>
+                    </div>
+                    <ul>
+                        <li>Traducción completa de menús, subtítulos y textos principales.</li>
+                        <li>Sincronización inicial de audio y corrección de pequeños errores generales.</li>
+                        <li>Mejoras de rendimiento y estabilidad en la interfaz.</li>
+                    </ul>
+                </div>
+
+                <!-- Créditos -->
+                <div class="credits-box">
+                    <h2 class="section-title" style="margin-top:0; border:none; padding:0;">Créditos</h2>
+                    <ul>
+                        <li><strong>Traducción y Edición:</strong> Colaborador 1 y Colaborador 2</li>
+                        <li><strong>Soporte Técnico y Gráficos:</strong> Miembro de Apoyo</li>
+                        <li><strong>Pruebas y QA:</strong> Tester de la Comunidad</li>
+                    </ul>
                 </div>
 
                 <!-- Botón de Descarga y Contador de Clics -->
