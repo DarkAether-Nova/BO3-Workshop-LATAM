@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Call of Duty: Black Ops III - Workshop</title>
+
     <style>
         :root {
             --steam-bg: #1b2838;
@@ -34,14 +35,12 @@
             padding-bottom: 50px;
         }
 
-        /* --- CONTENEDOR GENERAL --- */
         .steam-container {
             max-width: 1400px;
             margin: 20px auto;
             padding: 0 40px;
         }
 
-        /* --- CARRUSEL SUPERIOR ELEGANTE --- */
         .featured-carousel-container {
             position: relative;
             width: 100%;
@@ -120,7 +119,6 @@
             background: var(--steam-light-blue);
         }
 
-        /* --- SUBMENÚ DE NAVEGACIÓN CON ANIMACIÓN HOVER --- */
         .workshop-submenu {
             display: flex;
             justify-content: flex-start;
@@ -158,7 +156,6 @@
             border-bottom: 2px solid var(--steam-light-blue);
         }
 
-        /* Zona secreta invisible de 5 clics para el modo admin */
         .secret-admin-zone {
             width: 40px;
             height: 25px;
@@ -166,7 +163,6 @@
             margin-left: auto;
         }
 
-        /* --- LAYOUT PRINCIPAL (2 COLUMNAS) --- */
         .steam-main-layout {
             display: grid;
             grid-template-columns: 1fr 300px;
@@ -192,7 +188,6 @@
             padding-bottom: 10px;
         }
 
-        /* --- FORMULARIO DE REPORTE DE AUDIO --- */
         .report-form {
             display: flex;
             flex-direction: column;
@@ -259,7 +254,6 @@
             font-weight: bold;
         }
 
-        /* --- ESTILO DE COMENTARIOS TIPO YOUTUBE --- */
         .comments-section {
             display: flex;
             flex-direction: column;
@@ -350,7 +344,6 @@
             padding: 15px 0;
         }
 
-        /* --- SIDEBAR DERECHO --- */
         .steam-sidebar {
             display: flex;
             flex-direction: column;
@@ -411,7 +404,6 @@
             padding: 5px 0;
         }
 
-        /* --- WIDGET YOUTUBE --- */
         .youtube-widget {
             background: linear-gradient(135deg, #171a21 0%, #2a1215 100%);
             border: 1px solid #c4302b;
@@ -461,7 +453,6 @@
 </head>
 <body>
 
-    <!-- CONTENEDOR PRINCIPAL -->
     <div class="steam-container">
 
         <!-- CARRUSEL DE FOTOS -->
@@ -507,7 +498,6 @@
             <a href="index.html" class="workshop-sub-item">Mapas</a>
             <a href="reporte-de-errores.html" class="workshop-sub-item active">Reportar errores</a>
             <a href="anuncios.html" class="workshop-sub-item">ANUNCIOS</a>
-            <!-- Zona secreta invisible de 5 clics para el modo admin -->
             <div class="secret-admin-zone" id="secretAdminClicker" title=""></div>
         </div>
 
@@ -516,17 +506,17 @@
             
             <!-- COLUMNA IZQUIERDA -->
             <div>
-                <!-- SECCIÓN 1: LISTADO DE REPORTES (ESTILO COMENTARIOS YT) ARRIBA -->
+                <!-- SECCIÓN 1: LISTADO DE REPORTES -->
                 <div class="content-section">
                     <div class="section-title">
                         <span>Reportes de Audio Recientes</span>
                     </div>
                     <div class="comments-section" id="reportsCommentsList">
-                        <!-- Se cargarán dinámicamente aquí -->
+                        <div class="no-comments">Cargando reportes desde la nube...</div>
                     </div>
                 </div>
 
-                <!-- SECCIÓN 2: FORMULARIO ABAJO -->
+                <!-- SECCIÓN 2: FORMULARIO -->
                 <div class="content-section">
                     <div class="section-title">
                         <span>Reportar un Error de Audio</span>
@@ -552,8 +542,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="bugDescription">Descripción del error de audio (ej. volumen bajo, sonido desincronizado, eco)</label>
-                            <textarea id="bugDescription" name="descripcion" required placeholder="Explica detalladamente qué pasa con el audio y en qué momento ocurre..."></textarea>
+                            <label for="bugDescription">Descripción del error de audio</label>
+                            <textarea id="bugDescription" name="descripcion" required placeholder="Explica detalladamente qué pasa con el audio..."></textarea>
                         </div>
 
                         <button type="submit" class="submit-btn" id="submitBtn">Enviar Reporte</button>
@@ -565,7 +555,6 @@
             <!-- COLUMNA DERECHA: SIDEBAR -->
             <div class="steam-sidebar">
                 
-                <!-- Traductores -->
                 <div class="sidebar-widget">
                     <h3>Traductores</h3>
                     <div id="translatorsContainer">
@@ -587,7 +576,6 @@
                     </div>
                 </div>
 
-                <!-- WIDGET YOUTUBE -->
                 <div class="sidebar-widget youtube-widget">
                     <h3>Canal de YouTube</h3>
                     <a href="https://www.youtube.com/@BO3WorkshopLATAM" target="_blank" class="youtube-btn">
@@ -596,7 +584,6 @@
                     </a>
                 </div>
 
-                <!-- Contador de Visitas -->
                 <div class="sidebar-widget">
                     <h3>Visitas Globales</h3>
                     <div class="stat-counter" id="unique-visitors">042,891</div>
@@ -608,9 +595,31 @@
 
     </div>
 
-    <!-- SCRIPT -->
-    <script>
-        /* --- Lógica de Orden Dinámico de Traductores --- */
+    <!-- SCRIPT MODULAR DE FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBh0S3ySwlAi4c-oeVThsDgD1Z0DeRBmRg",
+            authDomain: "reporte-de-errores.firebaseapp.com",
+            projectId: "reporte-de-errores",
+            storageBucket: "reporte-de-errores.firebasestorage.app",
+            messagingSenderId: "562337182135",
+            appId: "1:562337182135:web:cf29f4e846ce87e899b832",
+            measurementId: "G-GLVTC1MGCX"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // Variables de control de Admin globales accesibles por window
+        let isAdminMode = false;
+        let clickCount = 0;
+        let clickTimer = null;
+
         window.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('translatorsContainer');
             if (container) {
@@ -626,17 +635,17 @@
                 }
                 rows.forEach(row => container.appendChild(row));
             }
-            loadComments();
             initSecretAdmin();
+            listenToReports();
         });
 
-        /* --- Lógica del Contador de Visitas Únicas --- */
+        // Contador de Visitas
         let uniqueVisitors = localStorage.getItem('map_visitors') ? parseInt(localStorage.getItem('map_visitors')) : 500;
         uniqueVisitors++;
         localStorage.setItem('map_visitors', uniqueVisitors);
         document.getElementById('unique-visitors').innerText = uniqueVisitors.toLocaleString();
 
-        /* --- Lógica del Carrusel --- */
+        // Carrusel
         let slideIndex = 0;
         const slides = document.querySelectorAll('.carousel-slide');
         const dots = document.querySelectorAll('.dot');
@@ -654,7 +663,7 @@
             setTimeout(showSlides, 3500);
         }
 
-        function currentSlide(n) {
+        window.currentSlide = function(n) {
             slideIndex = n;
             slides.forEach(slide => slide.classList.remove('active'));
             dots.forEach(dot => dot.classList.remove('active'));
@@ -663,23 +672,15 @@
             dots[slideIndex].classList.add('active');
         }
 
-            setTimeout(showSlides, 3500);
-
-        /* --- Sistema de Administración Secreto (5 Clics) --- */
-        let isAdminMode = false;
-        let clickCount = 0;
-        let clickTimer = null;
+        setTimeout(showSlides, 3500);
 
         function initSecretAdmin() {
             const zone = document.getElementById('secretAdminClicker');
             if (zone) {
                 zone.addEventListener('click', () => {
                     clickCount++;
-                    
                     clearTimeout(clickTimer);
-                    clickTimer = setTimeout(() => {
-                        clickCount = 0;
-                    }, 1000);
+                    clickTimer = setTimeout(() => { clickCount = 0; }, 1000);
 
                     if (clickCount >= 5) {
                         clickCount = 0;
@@ -689,76 +690,65 @@
             }
         }
 
-        /* --- Función para calcular el tiempo relativo automáticamente --- */
         function getTimeAgo(dateString) {
+            if (!dateString) return "Hace un momento";
             const now = new Date();
             const past = new Date(dateString);
             const secondsAgo = Math.floor((now - past) / 1000);
 
-            if (secondsAgo < 60) {
-                return "Hace un momento";
-            }
-            
+            if (secondsAgo < 60) return "Hace un momento";
             const minutesAgo = Math.floor(secondsAgo / 60);
-            if (minutesAgo < 60) {
-                return `Hace ${minutesAgo} ${minutesAgo === 1 ? 'minuto' : 'minutos'}`;
-            }
-
+            if (minutesAgo < 60) return `Hace ${minutesAgo} ${minutesAgo === 1 ? 'minuto' : 'minutos'}`;
             const hoursAgo = Math.floor(minutesAgo / 60);
-            if (hoursAgo < 24) {
-                return `Hace ${hoursAgo} ${hoursAgo === 1 ? 'hora' : 'horas'}`;
-            }
-
+            if (hoursAgo < 24) return `Hace ${hoursAgo} ${hoursAgo === 1 ? 'hora' : 'horas'}`;
             const daysAgo = Math.floor(hoursAgo / 24);
-            if (daysAgo < 30) {
-                return `Hace ${daysAgo} ${daysAgo === 1 ? 'día' : 'días'}`;
-            }
-
+            if (daysAgo < 30) return `Hace ${daysAgo} ${daysAgo === 1 ? 'día' : 'días'}`;
             const monthsAgo = Math.floor(daysAgo / 30);
-            if (monthsAgo < 12) {
-                return `Hace ${monthsAgo} ${monthsAgo === 1 ? 'mes' : 'meses'}`;
-            }
-
+            if (monthsAgo < 12) return `Hace ${monthsAgo} ${monthsAgo === 1 ? 'mes' : 'meses'}`;
             const yearsAgo = Math.floor(daysAgo / 365);
             return `Hace ${yearsAgo} ${yearsAgo === 1 ? 'año' : 'años'}`;
         }
 
-        function loadComments() {
+        function listenToReports() {
             const container = document.getElementById('reportsCommentsList');
-            let reports = JSON.parse(localStorage.getItem('bo3_audio_reports')) || [];
+            const q = query(collection(db, "audio_reports"), orderBy("createdAt", "desc"));
 
-            if (reports.length === 0) {
-                container.innerHTML = `<div class="no-comments">No hay reportes de audio aún. ¡Sé el primero en reportar un fallo abajo!</div>`;
-                return;
-            }
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = `<div class="no-comments">No hay reportes de audio aún. ¡Sé el primero en reportar un fallo abajo!</div>`;
+                    return;
+                }
 
-            container.innerHTML = "";
-            reports.forEach((rep, index) => {
-                const initial = rep.author.charAt(0).toUpperCase();
-                
-                // Si el reporte ya existía sin 'createdAt', usamos la fecha actual de respaldo
-                const reportDate = rep.createdAt ? rep.createdAt : new Date().toISOString();
-                const relativeTime = getTimeAgo(reportDate);
-                
-                const deleteButtonHTML = isAdminMode 
-                    ? `<div class="yt-actions"><span style="cursor:pointer; color: #ff4e45; font-weight: bold;" onclick="deleteReport(${index})">🗑️ Borrar este reporte</span></div>` 
-                    : '';
+                container.innerHTML = "";
+                snapshot.forEach((documentSnapshot) => {
+                    const rep = documentSnapshot.data();
+                    const docId = documentSnapshot.id;
+                    const initial = rep.author ? rep.author.charAt(0).toUpperCase() : "A";
+                    const relativeTime = getTimeAgo(rep.createdAt);
+                    
+                    const deleteButtonHTML = isAdminMode 
+                        ? `<div class="yt-actions"><span style="cursor:pointer; color: #ff4e45; font-weight: bold;" onclick="window.deleteReport('${docId}')">🗑️ Borrar este reporte</span></div>` 
+                        : '';
 
-                const commentHTML = `
-                    <div class="yt-comment" id="report-${index}">
-                        <div class="yt-avatar">${initial}</div>
-                        <div class="yt-content">
-                            <div class="yt-header">
-                                <span class="yt-author">@${rep.author}</span>
-                                <span class="yt-badge">${rep.map}</span>
-                                <span class="yt-time">${relativeTime}</span>
+                    const commentHTML = `
+                        <div class="yt-comment" id="report-${docId}">
+                            <div class="yt-avatar">${initial}</div>
+                            <div class="yt-content">
+                                <div class="yt-header">
+                                    <span class="yt-author">@${rep.author}</span>
+                                    <span class="yt-badge">${rep.map}</span>
+                                    <span class="yt-time">${relativeTime}</span>
+                                </div>
+                                <div class="yt-text">${rep.description}</div>
+                                ${deleteButtonHTML}
                             </div>
-                            <div class="yt-text">${rep.description}</div>
-                            ${deleteButtonHTML}
                         </div>
-                    </div>
-                `;
-                container.innerHTML += commentHTML;
+                    `;
+                    container.innerHTML += commentHTML;
+                });
+            }, (error) => {
+                console.error("Error al cargar reportes: ", error);
+                container.innerHTML = `<div class="no-comments" style="color: #ff4e45;">Error al conectar con la base de datos en la nube.</div>`;
             });
         }
 
@@ -766,23 +756,24 @@
             const password = prompt("Introduce la contraseña de administrador:");
             if (password === "workshoplatino") {
                 isAdminMode = !isAdminMode;
-                loadComments();
+                listenToReports();
                 alert(isAdminMode ? "Modo Administrador activado. Ya puedes ver los botones de borrado." : "Modo Administrador desactivado.");
             } else if (password !== null) {
                 alert("Contraseña incorrecta.");
             }
         }
 
-        function deleteReport(index) {
-            if (confirm("¿Estás seguro de querer borrar este reporte de la página?")) {
-                let reports = JSON.parse(localStorage.getItem('bo3_audio_reports')) || [];
-                reports.splice(index, 1);
-                localStorage.setItem('bo3_audio_reports', JSON.stringify(reports));
-                loadComments();
+        window.deleteReport = async function(docId) {
+            if (confirm("¿Estás seguro de querer borrar este reporte de la página para todos?")) {
+                try {
+                    await deleteDoc(doc(db, "audio_reports", docId));
+                } catch (error) {
+                    alert("Hubo un error al intentar borrar el reporte.");
+                }
             }
         }
 
-        async function submitReport(event) {
+        window.submitReport = async function(event) {
             event.preventDefault();
             const form = document.getElementById('bugReportForm');
             const submitBtn = document.getElementById('submitBtn');
@@ -797,38 +788,27 @@
             status.style.color = "#c7d5e0";
             status.innerText = "Enviando reporte...";
 
-            const formData = new FormData(form);
-
             try {
-                const responseUrl = "https://formspree.io/f/mzdnkqgy";
-                const res = await fetch(responseUrl, {
+                await addDoc(collection(db, "audio_reports"), {
+                    author: author,
+                    map: map,
+                    description: description,
+                    createdAt: new Date().toISOString()
+                });
+
+                const formData = new FormData(form);
+                fetch("https://formspree.io/f/mzdnkqgy", {
                     method: "POST",
                     body: formData,
                     headers: { 'Accept': 'application/json' }
-                });
+                }).catch(() => {});
 
-                if (res.ok) {
-                    let reports = JSON.parse(localStorage.getItem('bo3_audio_reports')) || [];
-                    const newReport = {
-                        author,
-                        map,
-                        description,
-                        createdAt: new Date().toISOString() // <-- Se guarda la fecha exacta automáticamente
-                    };
-                    reports.unshift(newReport);
-                    localStorage.setItem('bo3_audio_reports', JSON.stringify(reports));
-
-                    status.style.color = "#66c0f4";
-                    status.innerText = "¡Reporte de audio enviado y publicado correctamente!";
-                    form.reset();
-                    loadComments();
-                } else {
-                    status.style.color = "#ff4e45";
-                    status.innerText = "Hubo un problema al enviar el reporte. Inténtalo de nuevo.";
-                }
+                status.style.color = "#66c0f4";
+                status.innerText = "¡Reporte de audio enviado y publicado correctamente!";
+                form.reset();
             } catch (error) {
                 status.style.color = "#ff4e45";
-                status.innerText = "Error de conexión. Verifica tu red.";
+                status.innerText = "Error al enviar el reporte a la nube. Revisa tu conexión.";
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Enviar Reporte";
