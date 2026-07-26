@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Call of Duty: Black Ops III - Detalle del Mapa</title>
+    <title>Call of Duty: Black Ops III - Anuncios y Novedades</title>
     <style>
         :root {
             --steam-bg: #1b2838;
@@ -158,6 +158,7 @@
             border-bottom: 2px solid var(--steam-light-blue);
         }
 
+        /* Zona secreta invisible de 5 clics para el modo admin */
         .secret-admin-zone {
             width: 40px;
             height: 25px;
@@ -191,176 +192,115 @@
             padding-bottom: 10px;
         }
 
-        /* --- TRÁILER --- */
-        .media-section {
+        /* --- ESTILOS DE LA SECCIÓN DE ANUNCIOS --- */
+        .announcements-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 20px;
         }
 
-        .video-container {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: #000;
-            border-radius: 3px;
-            overflow: hidden;
-            border: 1px solid var(--steam-border);
-        }
-
-        .video-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* --- DESCRIPCIÓN DE LA TRADUCCIÓN --- */
-        .description-text {
-            font-size: 14px;
-            line-height: 1.6;
-            color: var(--steam-text);
-        }
-
-        /* --- NOTAS DEL PARCHE (ACORDEÓN) --- */
-        .patch-item {
-            border: 1px solid var(--steam-border);
-            background: var(--steam-dark);
-            border-radius: 3px;
-            margin-bottom: 10px;
-            overflow: hidden;
-        }
-
-        .patch-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            background: var(--steam-blue);
-            cursor: pointer;
-            user-select: none;
-            transition: background 0.2s;
-        }
-
-        .patch-header:hover {
-            background: #355c7d;
-        }
-
-        .version-badge {
+        /* Estilo para fecha de publicación */
+        .announcement-date {
             display: inline-block;
-            background: var(--steam-surface);
             color: var(--steam-light-blue);
-            padding: 3px 10px;
-            border-radius: 2px;
-            font-size: 13px;
-            font-weight: bold;
-            border: 1px solid rgba(102, 192, 244, 0.3);
-        }
-
-        .patch-date {
-            font-size: 12px;
-            color: #c7d5e0;
-            font-style: italic;
-        }
-
-        .patch-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-in-out, padding 0.3s ease;
-            padding: 0 15px;
-            background: var(--steam-surface);
-        }
-
-        .patch-item.active .patch-content {
-            max-height: 250px;
-            padding: 15px;
-        }
-
-        .patch-content ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .patch-content li {
-            position: relative;
-            padding-left: 18px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             margin-bottom: 6px;
-            font-size: 13px;
-            color: var(--steam-text);
         }
 
-        .patch-content li::before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: var(--steam-light-blue);
-            font-weight: bold;
-        }
-
-        /* --- CRÉDITOS --- */
-        .credits-list {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .credits-list li {
+        /* Estilo para anuncios de advertencia con signo de ! rojo */
+        .announcement-card-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            background-color: #0f141b;
+            border: 1px solid var(--steam-border);
+            padding: 18px;
+            border-radius: 3px;
+            transition: border-color 0.2s;
             position: relative;
-            padding-left: 18px;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: var(--steam-text);
+            overflow: hidden;
+        }
+
+        .announcement-card-alert::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: #ff3b30;
+        }
+
+        .announcement-card-alert:hover {
+            border-color: #ff3b30;
+        }
+
+        .announcement-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: rgba(255, 59, 48, 0.15);
+            border: 2px solid #ff3b30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .announcement-icon {
+            color: #ff3b30;
+            font-size: 26px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        /* Estilo para anuncios normales con imagen de nuevo mapa */
+        .announcement-card-image {
+            display: flex;
+            flex-direction: column;
+            background-color: #0f141b;
+            border: 1px solid var(--steam-border);
+            border-radius: 3px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .announcement-card-image:hover {
+            border-color: var(--steam-light-blue);
+        }
+
+        .announcement-banner {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--steam-border);
+        }
+
+        .announcement-body {
+            padding: 18px;
+        }
+
+        .announcement-info h4 {
+            color: #fff;
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .announcement-info p {
+            color: #8f98a0;
+            font-size: 13px;
             line-height: 1.5;
         }
 
-        .credits-list li::before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: var(--steam-light-blue);
-            font-weight: bold;
-        }
-
-        .credits-list li strong {
-            color: #fff;
-        }
-
-        /* --- BOTÓN DE DESCARGA --- */
-        .download-panel {
-            background: var(--steam-surface);
-            border: 1px solid var(--steam-border);
-            border-radius: 3px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-
-        .download-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: linear-gradient(to bottom, #76b733 0%, #588a25 100%);
-            color: #ffffff;
-            padding: 16px 45px;
-            border-radius: 2px;
-            font-size: 17px;
-            font-weight: bold;
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px solid #8ed63d;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
-            transition: background 0.2s;
+        .announcements-intro {
+            color: var(--steam-text-bright);
+            font-size: 14px;
+            line-height: 1.6;
             margin-bottom: 15px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-        }
-
-        .download-btn:hover {
-            background: linear-gradient(to bottom, #83cc38 0%, #619a29 100%);
-        }
-
-        .download-stats {
-            font-size: 15px;
-            color: #8f98a0;
         }
 
         /* --- SIDEBAR DERECHO --- */
@@ -397,7 +337,7 @@
             margin-bottom: 0;
         }
 
-        .creator-row .creator-avatar {
+        .creator-avatar {
             width: 48px;
             height: 48px;
             border-radius: 50%;
@@ -477,33 +417,33 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <div class="steam-container">
 
-        <!-- CARRUSEL DE FOTOS SUPERIOR -->
+        <!-- CARRUSEL DE FOTOS -->
         <div class="featured-carousel-container" id="carouselContainer">
-            <div class="carousel-slide active" style="background-image: url('fotosmob/m1.jpg');">
+            <div class="carousel-slide active" style="background-image: url('die.jpg');">
                 <div class="carousel-caption">
                     <span class="carousel-tag">Proyecto Destacado #01</span>
+                    <span class="carousel-title">Die Rise</span>
+                </div>
+            </div>
+
+            <div class="carousel-slide" style="background-image: url('mob.jpg');">
+                <div class="carousel-caption">
+                    <span class="carousel-tag">Proyecto Destacado #02</span>
                     <span class="carousel-title">Mob of the Dead</span>
                 </div>
             </div>
 
-            <div class="carousel-slide" style="background-image: url('fotosmob/m2.jpg');">
+            <div class="carousel-slide" style="background-image: url('derr.jpg');">
                 <div class="carousel-caption">
-                    <span class="carousel-tag">Proyecto Destacado #01</span>
-                    <span class="carousel-title">Mob of the Dead - Audio Latino</span>
+                    <span class="carousel-tag">Proyecto Destacado #03</span>
+                    <span class="carousel-title">Der Riese Declassified</span>
                 </div>
             </div>
 
-            <div class="carousel-slide" style="background-image: url('fotosmob/m3.jpg');">
+            <div class="carousel-slide" style="background-image: url('levia.jpg');">
                 <div class="carousel-caption">
-                    <span class="carousel-tag">Proyecto Destacado #01</span>
-                    <span class="carousel-title">Mob of the Dead - Audio Latino</span>
-                </div>
-            </div>
-
-            <div class="carousel-slide" style="background-image: url('fotosmob/m4.jpg');">
-                <div class="carousel-caption">
-                    <span class="carousel-tag">Proyecto Destacado #01</span>
-                    <span class="carousel-title">Mob of the Dead - Audio Latino</span>
+                    <span class="carousel-tag">Proyecto Destacado #04</span>
+                    <span class="carousel-title">Leviathan</span>
                 </div>
             </div>
 
@@ -517,9 +457,10 @@
 
         <!-- SUBMENÚ DE NAVEGACIÓN -->
         <div class="workshop-submenu">
-            <a href="index.html" class="workshop-sub-item active">Mapas</a>
+            <a href="index.html" class="workshop-sub-item">Mapas</a>
             <a href="errores.html" class="workshop-sub-item">Reportar errores</a>
-            <a href="anuncios.html" class="workshop-sub-item">Anuncios</a>
+            <a href="anuncios.html" class="workshop-sub-item active">Anuncios</a>
+            <!-- Zona secreta invisible -->
             <div class="secret-admin-zone" id="secretAdminClicker" title=""></div>
         </div>
 
@@ -528,87 +469,68 @@
             
             <!-- COLUMNA IZQUIERDA -->
             <div>
-                
-                <!-- TRÁILER -->
                 <div class="content-section">
-                    <div class="section-title"><span>Tráiler del Mapa</span></div>
-                    <div class="media-section">
-                        <div class="video-container">
-                            <iframe src="https://www.youtube.com/embed/i3toX40MCio" title="Tráiler" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                        </div>
+                    <div class="section-title">
+                        <span>Tablón de Anuncios y Novedades</span>
                     </div>
-                </div>
-
-                <!-- DESCRIPCIÓN DE LA TRADUCCIÓN -->
-                <div class="content-section">
-                    <div class="section-title"><span>Descripción de la Traducción</span></div>
-                    <p class="description-text">
-                        Esta adaptación completa al español incluye el doblaje total de los diálogos de los personajes principales, textos totalmente localizados a la interfaz y subtítulos sincronizados con precisión. Se han corregido pequeños bugs de audio originales de la versión de Steam Workshop y optimizado la estabilidad general para ofrecer una experiencia inigualable en este mapa emblemático.
-                    </p>
-                </div>
-
-                <!-- NOTAS DEL PARCHE -->
-                <div class="content-section">
-                    <div class="section-title"><span>Notas del Parche</span></div>
                     
-                    <div class="patch-item active">
-                        <div class="patch-header" onclick="togglePatch(this)">
-                            <span class="version-badge">Versión 1.3</span>
-                            <span class="patch-date">Lanzamiento: 25 de Julio de 2026</span>
-                        </div>
-                        <div class="patch-content">
-                            <ul>
-                                <li>Optimización general de texturas y solución de pequeños errores de script.</li>
-                                <li>Mejora en la sincronización de líneas de voz secundarias.</li>
-                            </ul>
-                        </div>
-                    </div>
+                    <p class="announcements-intro">
+                        Entérate de los lanzamientos de nuevos mapas en desarrollo, eventos especiales de la comunidad y avisos de importancia.
+                    </p>
 
-                    <div class="patch-item">
-                        <div class="patch-header" onclick="togglePatch(this)">
-                            <span class="version-badge">Versión 1.2</span>
-                            <span class="patch-date">Lanzamiento: 24 de Julio de 2026</span>
+                    <div class="announcements-container">
+                        
+                        <!-- ANUNCIO CON FOTO DE NUEVO MAPA 1 -->
+                        <div class="announcement-card-image">
+                            <img src="bloodbanner.png" alt="Nuevo Mapa" class="announcement-banner">
+                            <div class="announcement-body">
+                                <span class="announcement-date">Publicado: 24 de Julio, 2026</span>
+                                <div class="announcement-info">
+                                    <h4>¡Nuevo Mapa en Traduccion: Blood of the dead!</h4>
+                                    <p>Pronto podrás disfrutar de este genial mapa en 7 idiomas diferentes, para que jugadores de todo el mundo puedan vivir la experiencia en su idioma con una traducción cuidada y de alta calidad.
+</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="patch-content">
-                            <ul>
-                                <li>Actualización de estabilidad general y soporte de audio mejorado.</li>
-                            </ul>
-                        </div>
-                    </div>
 
-                    <div class="patch-item">
-                        <div class="patch-header" onclick="togglePatch(this)">
-                            <span class="version-badge">Versión 1.0.0 (Build Inicial)</span>
-                            <span class="patch-date">Lanzamiento: 22 de Julio de 2026</span>
+                        <!-- ANUNCIO DE ADVERTENCIA CON SIGNO ! ROJO 1 -->
+                        <div class="announcement-card-alert">
+                            <div class="announcement-icon-wrapper">
+                                <span class="announcement-icon">!</span>
+                            </div>
+                            <div class="announcement-info">
+                                <span class="announcement-date">Publicado: 20 de Julio, 2026</span>
+                                <h4>Actualización de la pagina web</h4>
+                                <p>Algunas secciones de los mapas aún no se encuentran disponibles. Por el momento, solo Mob of the Dead está completamente habilitado mientras se continúa trabajando en la adaptación y compatibilidad del contenido restante.</p>
+                            </div>
                         </div>
-                        <div class="patch-content">
-                            <ul>
-                                <li>Lanzamiento inicial del proyecto con doblaje completo al español latino.</li>
-                            </ul>
+
+                        <!-- ANUNCIO CON FOTO DE NUEVO MAPA 2 -->
+                        <div class="announcement-card-image">
+                            <img src="five.png" alt="Nuevo Mapa" class="announcement-banner">
+                            <div class="announcement-body">
+                                <span class="announcement-date">Publicado: 15 de Julio, 2026</span>
+                                <div class="announcement-info">
+                                    <h4>¡Nuevo Mapa en Traduccion: FIVE!</h4>
+                                    <p>Pronto podrás disfrutar del mapa FIVE completamente en español, con una traducción pensada para mejorar la experiencia de juego y permitir que la comunidad pueda disfrutar de este icónico mapa en su idioma.</p>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- ANUNCIO DE ADVERTENCIA CON SIGNO ! ROJO 2 -->
+                        <div class="announcement-card-alert">
+                            <div class="announcement-icon-wrapper">
+                                <span class="announcement-icon">!</span>
+                            </div>
+                            <div class="announcement-info">
+                                <span class="announcement-date">Publicado: 10 de Julio, 2026</span>
+                                <h4>Mantenimiento de Servidores de Descarga</h4>
+                                <p>Habrá una interrupción temporal en los enlaces directos de descarga este fin de semana debido a labores de migración a un nuevo servidor con mayor ancho de banda.</p>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-
-                <!-- CRÉDITOS -->
-                <div class="content-section">
-                    <div class="section-title"><span>Créditos</span></div>
-                    <ul class="credits-list">
-                        <li><strong>Traducción y Edición:</strong> Colaborador 1 y Colaborador 2</li>
-                        <li><strong>Soporte Técnico y Gráficos:</strong> Miembro de Apoyo</li>
-                        <li><strong>Pruebas y QA:</strong> Tester de la Comunidad</li>
-                    </ul>
-                </div>
-
-                <!-- LINK DE DESCARGA -->
-                <div class="download-panel">
-                    <a href="https://drive.google.com/file/d/1DQKQKl9NTA4yMje9xqnEH3aUJgVXVAjX/view" class="download-btn" id="downloadBtn" target="_blank" onclick="incrementDownloadCount(event)">
-                        Descargar traduccion
-                    </a>
-                    <div class="download-stats">
-                        Descargas totales: <span id="download-count" style="font-weight: bold; color: var(--steam-light-blue); font-size: 18px;">1,256</span>
-                    </div>
-                </div>
-
             </div>
 
             <!-- COLUMNA DERECHA: SIDEBAR -->
@@ -678,29 +600,15 @@
         });
 
         /* --- Lógica del Contador de Visitas Únicas --- */
-        let uniqueVisitors = localStorage.getItem('map_visitors') ? parseInt(localStorage.getItem('map_visitors')) : 42891;
+        let uniqueVisitors = localStorage.getItem('map_visitors') ? parseInt(localStorage.getItem('map_visitors')) : 500;
         uniqueVisitors++;
         localStorage.setItem('map_visitors', uniqueVisitors);
         document.getElementById('unique-visitors').innerText = uniqueVisitors.toLocaleString();
 
-        /* --- Lógica del Contador de Descargas --- */
-        let downloadClicks = localStorage.getItem('map_downloads') ? parseInt(localStorage.getItem('map_downloads')) : 1256;
-        function updateDownloadDisplay() {
-            document.getElementById('download-count').innerText = downloadClicks.toLocaleString();
-        }
-        updateDownloadDisplay();
-
-        function incrementDownloadCount(event) {
-            downloadClicks++;
-            localStorage.setItem('map_downloads', downloadClicks);
-            updateDownloadDisplay();
-        }
-
-        /* --- Lógica del Carrusel Superior --- */
+        /* --- Lógica del Carrusel --- */
         let slideIndex = 0;
         const slides = document.querySelectorAll('.carousel-slide');
         const dots = document.querySelectorAll('.dot');
-        let slideInterval;
 
         function showSlides() {
             slides.forEach(slide => slide.classList.remove('active'));
@@ -711,6 +619,8 @@
             
             slides[slideIndex - 1].classList.add('active');
             dots[slideIndex - 1].classList.add('active');
+            
+            setTimeout(showSlides, 3500);
         }
 
         function currentSlide(n) {
@@ -720,21 +630,9 @@
             
             slides[slideIndex].classList.add('active');
             dots[slideIndex].classList.add('active');
-            resetTimer();
         }
 
-        function resetTimer() {
-            clearInterval(slideInterval);
-            slideInterval = setInterval(showSlides, 4000);
-        }
-
-        slideInterval = setInterval(showSlides, 4000);
-
-        /* --- Acordeón de Notas del Parche --- */
-        function togglePatch(headerElement) {
-            const parentItem = headerElement.parentElement;
-            parentItem.classList.toggle('active');
-        }
+        setTimeout(showSlides, 3500);
     </script>
 </body>
 </html>
