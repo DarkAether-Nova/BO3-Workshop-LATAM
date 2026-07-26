@@ -189,6 +189,43 @@
             padding-bottom: 10px;
         }
 
+        .map-report-section {
+            background-color: var(--steam-surface);
+            border: 1px solid var(--steam-border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .map-header-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            display: block;
+            border-bottom: 1px solid var(--steam-border);
+        }
+
+        .map-header-info {
+            padding: 15px 20px;
+            background: linear-gradient(to bottom, #171a21, #0f141b);
+            border-bottom: 1px solid var(--steam-border);
+        }
+
+        .map-header-title {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .map-reports-container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
         .report-form {
             display: flex;
             flex-direction: column;
@@ -249,17 +286,33 @@
             background-color: #fff;
         }
 
+        .submit-btn:disabled {
+            background-color: #303f53;
+            color: #8f98a0;
+            cursor: not-allowed;
+        }
+
+        /* Estilo mejorado y más grande para el aviso de cooldown */
         #formStatus {
-            font-size: 13px;
-            margin-top: 5px;
+            font-size: 14px;
             font-weight: bold;
+            padding: 12px;
+            border-radius: 2px;
+            margin-bottom: 5px;
+            display: none;
+        }
+
+        #formStatus.cooldown-alert {
+            background-color: rgba(255, 78, 69, 0.15);
+            border: 1px solid rgba(255, 78, 69, 0.4);
+            color: #ff4e45;
+            display: block;
         }
 
         .comments-section {
             display: flex;
             flex-direction: column;
             gap: 20px;
-            margin-top: 15px;
         }
 
         .yt-comment {
@@ -425,7 +478,7 @@
             font-style: italic;
             font-size: 13px;
             text-align: center;
-            padding: 15px 0;
+            padding: 10px 0;
         }
 
         .steam-sidebar {
@@ -590,12 +643,12 @@
             
             <!-- COLUMNA IZQUIERDA -->
             <div>
-                <!-- SECCIÓN 1: LISTADO DE REPORTES -->
+                <!-- SECCIÓN 1: LISTADO DE REPORTES ORGANIZADOS POR SECCIONES DE MAPA -->
                 <div class="content-section">
                     <div class="section-title">
-                        <span>Reportes de Audio Recientes</span>
+                        <span>Reportes de Audio por Mapa</span>
                     </div>
-                    <div class="comments-section" id="reportsCommentsList">
+                    <div id="reportsByMapContainer">
                         <div class="no-comments">Cargando reportes desde la nube...</div>
                     </div>
                 </div>
@@ -615,7 +668,7 @@
 
                         <div class="form-group">
                             <label for="mapName">Mapa o sección afectada</label>
-                            <select id="mapName" name="mapa">
+                            <select id="mapName" name="mapa" onchange="checkMapCooldown()">
                                 <option value="Die Rise">Die Rise v4</option>
                                 <option value="Mob of the Dead">Mob of the Dead v3</option>
                                 <option value="Der Riese Declassified">Der Riese Declassified v3</option>
@@ -630,8 +683,10 @@
                             <textarea id="bugDescription" name="descripcion" required placeholder="Explica detalladamente qué pasa con el audio..."></textarea>
                         </div>
 
-                        <button type="submit" class="submit-btn" id="submitBtn">Enviar Reporte</button>
+                        <!-- AVISO DE COOLDOWN POSICIONADO ARRIBA DEL BOTÓN Y MÁS VISIBLE -->
                         <div id="formStatus"></div>
+
+                        <button type="submit" class="submit-btn" id="submitBtn">Enviar Reporte</button>
                     </form>
                 </div>
             </div>
@@ -679,7 +734,7 @@
 
     </div>
 
-    <!-- SCRIPT DE FIREBASE CON MEMORIA DE NOMBRES -->
+    <!-- SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
@@ -705,6 +760,15 @@
 
         const protectedNames = ["aether", "lospros2.09", "cabra"];
 
+        const mapsConfig = [
+            { name: "Die Rise", image: "die.jpg" },
+            { name: "Mob of the Dead", image: "mob.jpg" },
+            { name: "Der Riese Declassified", image: "derr.jpg" },
+            { name: "Nuketown Zombies", image: "nuke.jpg" },
+            { name: "Leviathan", image: "levia.jpg" },
+            { name: "Otro / General", image: "die.jpg" }
+        ];
+
         function isProtectedName(name) {
             if (!name) return false;
             return protectedNames.includes(name.trim().toLowerCase());
@@ -726,7 +790,6 @@
                 rows.forEach(row => container.appendChild(row));
             }
 
-            // Cargar automáticamente el nombre guardado en el formulario principal
             const savedName = localStorage.getItem('workshop_user_name');
             if (savedName) {
                 document.getElementById('authorName').value = savedName;
@@ -734,6 +797,7 @@
 
             initSecretAdmin();
             loadReports();
+            checkMapCooldown();
         });
 
         let uniqueVisitors = localStorage.getItem('map_visitors') ? parseInt(localStorage.getItem('map_visitors')) : 500;
@@ -804,95 +868,143 @@
             return `Hace ${yearsAgo} ${yearsAgo === 1 ? 'año' : 'años'}`;
         }
 
-        async function loadReports() {
-            const container = document.getElementById('reportsCommentsList');
-            try {
-                const querySnapshot = await getDocs(collection(db, "audio_reports"));
-                if (querySnapshot.empty) {
-                    container.innerHTML = `<div class="no-comments">No hay reportes de audio aún. ¡Sé el primero en reportar un fallo abajo!</div>`;
+        window.checkMapCooldown = function() {
+            const mapSelect = document.getElementById('mapName');
+            const submitBtn = document.getElementById('submitBtn');
+            const status = document.getElementById('formStatus');
+            
+            if (!mapSelect) return;
+            const selectedMap = mapSelect.value;
+            
+            const cooldowns = JSON.parse(localStorage.getItem('map_report_cooldowns') || '{}');
+            const lastReportTime = cooldowns[selectedMap];
+
+            if (lastReportTime) {
+                const now = new Date().getTime();
+                const oneHour = 60 * 60 * 1000; 
+                const elapsed = now - lastReportTime;
+
+                if (elapsed < oneHour) {
+                    const remainingMinutes = Math.ceil((oneHour - elapsed) / (60 * 1000));
+                    submitBtn.disabled = true;
+                    status.className = "cooldown-alert";
+                    status.innerHTML = `⏳ Debes esperar <b>${remainingMinutes} ${remainingMinutes === 1 ? 'minuto' : 'minutos'}</b> más para enviar otro reporte en este mapa.`;
                     return;
                 }
+            }
 
-                let reports = [];
+            submitBtn.disabled = false;
+            status.className = "";
+            status.innerHTML = "";
+        }
+
+        async function loadReports() {
+            const mainContainer = document.getElementById('reportsByMapContainer');
+            try {
+                const querySnapshot = await getDocs(collection(db, "audio_reports"));
+                let allReports = [];
                 querySnapshot.forEach((docSnap) => {
-                    reports.push({ id: docSnap.id, ...docSnap.data() });
+                    allReports.push({ id: docSnap.id, ...docSnap.data() });
                 });
 
-                reports.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+                allReports.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
-                container.innerHTML = "";
-                reports.forEach((rep) => {
-                    const isAdmin = isProtectedName(rep.author);
-                    const initial = rep.author ? rep.author.charAt(0).toUpperCase() : "A";
-                    const relativeTime = getTimeAgo(rep.createdAt);
-                    
-                    const deleteButtonHTML = isAdminMode 
-                        ? `<span style="cursor:pointer; color: #ff4e45; font-weight: bold;" onclick="window.deleteReport('${rep.id}')">🗑️ Borrar reporte</span>` 
-                        : '';
+                mainContainer.innerHTML = "";
 
-                    let repliesHTML = '';
-                    if (rep.replies && rep.replies.length > 0) {
-                        rep.replies.forEach(reply => {
-                            const isReplyAdmin = isProtectedName(reply.author);
-                            const replyInitial = reply.author ? reply.author.charAt(0).toUpperCase() : "R";
-                            const replyAdminClass = isReplyAdmin ? "admin-name" : "";
-                            const replyAvatarClass = isReplyAdmin ? "yt-avatar admin-avatar reply-avatar" : "yt-avatar reply-avatar";
-                            const replyBadge = isReplyAdmin ? `<span class="yt-badge admin-badge">CRIADOR / ADMIN</span>` : `<span class="yt-badge">${reply.map || ''}</span>`;
+                mapsConfig.forEach(mapInfo => {
+                    const mapReports = allReports.filter(rep => rep.map === mapInfo.name);
 
-                            repliesHTML += `
-                                <div class="reply-item">
-                                    <div class="${replyAvatarClass}">${replyInitial}</div>
-                                    <div class="yt-content">
-                                        <div class="yt-header">
-                                            <span class="yt-author ${replyAdminClass}">@${reply.author}</span>
-                                            ${replyBadge}
-                                            <span class="yt-time">${getTimeAgo(reply.createdAt)}</span>
+                    let reportsHTML = "";
+                    if (mapReports.length === 0) {
+                        reportsHTML = `<div class="no-comments">No hay reportes de audio para este mapa todavía.</div>`;
+                    } else {
+                        mapReports.forEach(rep => {
+                            const isAdmin = isProtectedName(rep.author);
+                            const initial = rep.author ? rep.author.charAt(0).toUpperCase() : "A";
+                            const relativeTime = getTimeAgo(rep.createdAt);
+                            
+                            const deleteButtonHTML = isAdminMode 
+                                ? `<span style="cursor:pointer; color: #ff4e45; font-weight: bold;" onclick="window.deleteReport('${rep.id}')">🗑️ Borrar reporte</span>` 
+                                : '';
+
+                            let repliesHTML = '';
+                            if (rep.replies && rep.replies.length > 0) {
+                                rep.replies.forEach(reply => {
+                                    const isReplyAdmin = isProtectedName(reply.author);
+                                    const replyInitial = reply.author ? reply.author.charAt(0).toUpperCase() : "R";
+                                    const replyAdminClass = isReplyAdmin ? "admin-name" : "";
+                                    const replyAvatarClass = isReplyAdmin ? "yt-avatar admin-avatar reply-avatar" : "yt-avatar reply-avatar";
+                                    const replyBadge = isReplyAdmin ? `<span class="yt-badge admin-badge">ADMIN</span>` : ``;
+
+                                    repliesHTML += `
+                                        <div class="reply-item">
+                                            <div class="${replyAvatarClass}">${replyInitial}</div>
+                                            <div class="yt-content">
+                                                <div class="yt-header">
+                                                    <span class="yt-author ${replyAdminClass}">@${reply.author}</span>
+                                                    ${replyBadge}
+                                                    <span class="yt-time">${getTimeAgo(reply.createdAt)}</span>
+                                                </div>
+                                                <div class="yt-text">${reply.text}</div>
+                                            </div>
                                         </div>
-                                        <div class="yt-text">${reply.text}</div>
+                                    `;
+                                });
+                            }
+
+                            const avatarClass = isAdmin ? "yt-avatar admin-avatar" : "yt-avatar";
+                            const authorClass = isAdmin ? "yt-author admin-name" : "yt-author";
+                            const badgeHTML = isAdmin ? `<span class="yt-badge admin-badge">ADMIN</span>` : ``;
+
+                            reportsHTML += `
+                                <div class="yt-comment" id="report-${rep.id}">
+                                    <div class="comment-main-row">
+                                        <div class="${avatarClass}">${initial}</div>
+                                        <div class="yt-content">
+                                            <div class="yt-header">
+                                                <span class="${authorClass}">@${rep.author}</span>
+                                                ${badgeHTML}
+                                                <span class="yt-time">${relativeTime}</span>
+                                            </div>
+                                            <div class="yt-text">${rep.description}</div>
+                                            <div class="yt-actions">
+                                                <span class="reply-trigger" onclick="window.toggleReplyBox('${rep.id}')">💬 Responder</span>
+                                                ${deleteButtonHTML}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="replies-container" id="repliesList-${rep.id}">
+                                        ${repliesHTML}
+                                    </div>
+
+                                    <div class="reply-box" id="replyBox-${rep.id}">
+                                        <input type="text" id="replyAuthor-${rep.id}" placeholder="Tu nombre o alias">
+                                        <textarea id="replyText-${rep.id}" placeholder="Escribe tu respuesta..."></textarea>
+                                        <button onclick="window.sendReply('${rep.id}')">Enviar respuesta</button>
                                     </div>
                                 </div>
                             `;
                         });
                     }
 
-                    const avatarClass = isAdmin ? "yt-avatar admin-avatar" : "yt-avatar";
-                    const authorClass = isAdmin ? "yt-author admin-name" : "yt-author";
-                    const badgeHTML = isAdmin ? `<span class="yt-badge admin-badge">CRIADOR / ADMIN</span>` : `<span class="yt-badge">${rep.map}</span>`;
-
-                    const commentHTML = `
-                        <div class="yt-comment" id="report-${rep.id}">
-                            <div class="comment-main-row">
-                                <div class="${avatarClass}">${initial}</div>
-                                <div class="yt-content">
-                                    <div class="yt-header">
-                                        <span class="${authorClass}">@${rep.author}</span>
-                                        ${badgeHTML}
-                                        <span class="yt-time">${relativeTime}</span>
-                                    </div>
-                                    <div class="yt-text">${rep.description}</div>
-                                    <div class="yt-actions">
-                                        <span class="reply-trigger" onclick="window.toggleReplyBox('${rep.id}')">💬 Responder</span>
-                                        ${deleteButtonHTML}
-                                    </div>
-                                </div>
+                    const mapSectionHTML = `
+                        <div class="map-report-section">
+                            <img src="${mapInfo.image}" alt="${mapInfo.name}" class="map-header-img" onerror="this.style.display='none'">
+                            <div class="map-header-info">
+                                <div class="map-header-title">${mapInfo.name}</div>
                             </div>
-
-                            <div class="replies-container" id="repliesList-${rep.id}">
-                                ${repliesHTML}
-                            </div>
-
-                            <div class="reply-box" id="replyBox-${rep.id}">
-                                <input type="text" id="replyAuthor-${rep.id}" placeholder="Tu nombre o alias">
-                                <textarea id="replyText-${rep.id}" placeholder="Escribe tu respuesta..."></textarea>
-                                <button onclick="window.sendReply('${rep.id}')">Enviar respuesta</button>
+                            <div class="map-reports-container comments-section">
+                                ${reportsHTML}
                             </div>
                         </div>
                     `;
-                    container.innerHTML += commentHTML;
+                    mainContainer.innerHTML += mapSectionHTML;
                 });
+
             } catch (error) {
                 console.error("Error al cargar reportes: ", error);
-                container.innerHTML = `<div class="no-comments" style="color: #ff4e45;">Error al conectar con la base de datos.</div>`;
+                mainContainer.innerHTML = `<div class="no-comments" style="color: #ff4e45;">Error al conectar con la base de datos.</div>`;
             }
         }
 
@@ -902,7 +1014,6 @@
                 const isOpening = box.style.display !== 'flex';
                 box.style.display = isOpening ? 'flex' : 'none';
                 
-                // Si se abre la caja, rellenar automáticamente con el nombre guardado
                 if (isOpening) {
                     const savedName = localStorage.getItem('workshop_user_name');
                     const replyInput = document.getElementById(`replyAuthor-${docId}`);
@@ -933,7 +1044,6 @@
                 }
             }
 
-            // Guardar nombre en memoria del navegador
             localStorage.setItem('workshop_user_name', author);
 
             try {
@@ -991,11 +1101,11 @@
                 }
             }
 
-            // Guardar nombre en memoria del navegador
             localStorage.setItem('workshop_user_name', author);
 
             submitBtn.disabled = true;
             submitBtn.innerText = "Enviando...";
+            status.className = "";
             status.style.color = "#c7d5e0";
             status.innerText = "Enviando reporte...";
 
@@ -1008,6 +1118,10 @@
                     replies: []
                 });
 
+                const cooldowns = JSON.parse(localStorage.getItem('map_report_cooldowns') || '{}');
+                cooldowns[map] = new Date().getTime();
+                localStorage.setItem('map_report_cooldowns', JSON.stringify(cooldowns));
+
                 const formData = new FormData(form);
                 fetch("https://formspree.io/f/mzdnkqgy", {
                     method: "POST",
@@ -1015,18 +1129,19 @@
                     headers: { 'Accept': 'application/json' }
                 }).catch(() => {});
 
+                status.className = "cooldown-alert";
                 status.style.color = "#66c0f4";
-                status.innerText = "¡Reporte enviado y publicado correctamente!";
+                status.innerHTML = "¡Reporte enviado y publicado correctamente!";
                 form.reset();
                 
-                // Volver a colocar el nombre guardado después de limpiar el formulario
                 document.getElementById('authorName').value = author;
                 
                 loadReports();
+                checkMapCooldown();
             } catch (error) {
+                status.className = "cooldown-alert";
                 status.style.color = "#ff4e45";
-                status.innerText = "Error al enviar el reporte a la nube.";
-            } finally {
+                status.innerHTML = "Error al enviar el reporte a la nube.";
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Enviar Reporte";
             }
